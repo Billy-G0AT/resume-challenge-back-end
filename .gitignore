@@ -1,0 +1,9 @@
+# Ignore Terraform State Files
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+.terraform.tfstate.lock.info
+
+# Ignore Python Meta Files
+__pycache__/
