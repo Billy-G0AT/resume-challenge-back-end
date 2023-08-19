@@ -1,10 +1,10 @@
 #* Domain Bucket
-resource "aws_s3_bucket" "hcl-domain-bucket" {
+resource "aws_s3_bucket" "this" {
   bucket = var.domain
 }
 
 #* Domain Bucket Index File
-resource "aws_s3_bucket_website_configuration" "hcl-domain-webconfig" {
+resource "aws_s3_bucket_website_configuration" "this" {
   bucket = var.domain
   index_document {
     suffix = "index.html"
@@ -12,7 +12,7 @@ resource "aws_s3_bucket_website_configuration" "hcl-domain-webconfig" {
 }
 
 #* Domain Bucket Allow Public Access 
-resource "aws_s3_bucket_public_access_block" "hcl-domain-bucket-public-access" {
+resource "aws_s3_bucket_public_access_block" "this" {
   bucket                  = var.domain
   block_public_acls       = false
   block_public_policy     = false
@@ -21,7 +21,7 @@ resource "aws_s3_bucket_public_access_block" "hcl-domain-bucket-public-access" {
 }
 
 #* Domain Bucket Policy Document
-data "aws_iam_policy_document" "hcl-domain-policy-doc" {
+data "aws_iam_policy_document" "this" {
   statement {
     sid       = "PublicReadGetObject"
     effect    = "Allow"
@@ -35,9 +35,9 @@ data "aws_iam_policy_document" "hcl-domain-policy-doc" {
 }
 
 #* Domain Bucket Policy
-resource "aws_s3_bucket_policy" "hcl-domain-policy" {
+resource "aws_s3_bucket_policy" "this" {
   bucket = var.domain
-  policy = data.aws_iam_policy_document.hcl-domain-policy-doc.json
+  policy = data.aws_iam_policy_document.this.json
 }
 
 
