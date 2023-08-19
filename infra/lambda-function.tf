@@ -28,7 +28,7 @@ resource "aws_iam_role_policy_attachment" "full_access" {
 }
 
 #* Zips Lambda Function
-data "archive_file" "this" {
+data "archive_file" "lambda" {
   type        = "zip"
   source_file = "../lambda/visit_count_lambda_function.py"
   output_path = "../lambda/visit_count_lambda_function.zip"
@@ -42,9 +42,9 @@ resource "aws_lambda_function" "this" {
   runtime       = "python3.10"
   memory_size   = 128
   timeout       = 3
-  filename      = data.archive_file.this.output_path
+  filename      = data.archive_file.lambda.output_path
   source_code_hash = filebase64sha256(
-    data.archive_file.this.output_path
+    data.archive_file.lambda.output_path
   )
 }
 

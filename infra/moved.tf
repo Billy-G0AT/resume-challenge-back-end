@@ -76,7 +76,7 @@ moved {
 
 moved {
   from = archive_file.hcl-lambda-zip
-  to = archive_file.this
+  to = archive_file.lambda
 }
 
 moved {
