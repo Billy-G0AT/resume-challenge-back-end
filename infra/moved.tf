@@ -57,3 +57,29 @@ moved {
   from = aws_dynamodb_table.hcl-table
   to = aws_dynamodb_table.this
 }
+# ---------------------------------------------------
+#* lambda-function.tf
+moved {
+  from = aws_iam_role.hcl-lambda-role
+  to = aws_iam_role.this
+}
+
+moved {
+  from = aws_iam_role_policy_attachment.hcl-basic-execution-policy
+  to = aws_iam_role_policy_attachment.basic_execution
+}
+
+moved {
+  from = aws_iam_role_policy_attachment.hcl-dynamodb-full-access-policy
+  to = aws_iam_role_policy_attachment.full_access
+}
+
+moved {
+  from = archive_file.hcl-lambda-zip
+  to = archive_file.this
+}
+
+moved {
+  from = aws_lambda_function.hcl-lambda
+  to = aws_lambda_function.this
+}

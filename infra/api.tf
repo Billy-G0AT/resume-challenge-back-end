@@ -30,7 +30,7 @@ resource "aws_apigatewayv2_stage" "this" {
 #* API Integration
 resource "aws_apigatewayv2_integration" "this" {
   api_id                 = aws_apigatewayv2_api.this.id
-  integration_uri        = aws_lambda_function.hcl-lambda.arn
+  integration_uri        = aws_lambda_function.this.arn
   integration_type       = "AWS_PROXY"
   integration_method     = "POST"
   payload_format_version = "2.0"
