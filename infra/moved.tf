@@ -50,3 +50,10 @@ moved {
   from = aws_s3_bucket_policy.hcl-domain-policy
   to = aws_s3_bucket_policy.this
 }
+# ----------------------------------------------------
+#*dynamodb.tf
+
+moved {
+  from = aws_dynamodb_table.hcl-table
+  to = aws_dynamodb_table.this
+}
