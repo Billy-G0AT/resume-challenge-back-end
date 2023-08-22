@@ -20,9 +20,9 @@ resource "aws_cloudfront_distribution" "this" {
       "HEAD",
     ]
     compress               = true
-    default_ttl            = 86400
-    max_ttl                = 31536000
-    min_ttl                = 1
+    # default_ttl            = 86400
+    # max_ttl                = 31536000
+    # min_ttl                = 1
     smooth_streaming       = false
     target_origin_id       = aws_s3_bucket_website_configuration.this.website_endpoint
     trusted_key_groups     = []
