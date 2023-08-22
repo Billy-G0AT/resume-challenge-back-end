@@ -22,4 +22,3 @@ variable "api" {
   description = "visit count api name"
   type        = string
 }
-
