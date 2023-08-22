@@ -47,5 +47,3 @@ resource "aws_lambda_function" "this" {
     data.archive_file.lambda.output_path
   )
 }
-
-

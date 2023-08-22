@@ -1,9 +1,12 @@
+#* Certificate
 resource "aws_acm_certificate" "this" {
-  provider = aws.east
-  domain_name       = var.domain
-  validation_method = "DNS"
+  provider                  = aws.east
+  domain_name               = var.domain
+  validation_method         = "DNS"
   subject_alternative_names = [var.domain, var.subdomain]
 }
+
+#* Cloudfront Distribution
 resource "aws_cloudfront_distribution" "this" {
   aliases         = [var.domain, var.subdomain]
   enabled         = true
@@ -14,15 +17,17 @@ resource "aws_cloudfront_distribution" "this" {
       "GET",
       "HEAD",
     ]
+    # ID For Default Cache Optimized Policy
     cache_policy_id = "658327ea-f89d-4fab-a63d-7e88639e58f6"
     cached_methods = [
       "GET",
       "HEAD",
     ]
-    compress               = true
-    # default_ttl            = 86400
-    # max_ttl                = 31536000
-    # min_ttl                = 1
+    compress = true
+    # Changes Cache Time, will leave for future reference
+    # default_ttl            = 
+    # max_ttl                = 
+    # min_ttl                = 
     smooth_streaming       = false
     target_origin_id       = aws_s3_bucket_website_configuration.this.website_endpoint
     trusted_key_groups     = []

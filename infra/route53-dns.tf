@@ -1,7 +1,9 @@
+#* Route53 Zone
 resource "aws_route53_zone" "this" {
   name = var.domain
 }
 
+#* Domain Record
 resource "aws_route53_record" "domain" {
   name    = var.domain
   type    = "A"
@@ -14,6 +16,7 @@ resource "aws_route53_record" "domain" {
   }
 }
 
+#* Subdomain Record
 resource "aws_route53_record" "subdomain" {
   name    = var.subdomain
   type    = "A"
