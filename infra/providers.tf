@@ -1,3 +1,14 @@
+terraform {
+  backend "s3" {
+    bucket = "terraform-state-resume"
+    key    = "terraform/state/terraform.tfstate"
+    region = "us-west-1"
+    dynamodb_table = "terraform-state-lock"
+    encrypt = true
+  }
+}
+
+
 provider "aws" {
   region = "us-west-1"
 }
