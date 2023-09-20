@@ -1,0 +1,191 @@
+name: Test-Plan-Deploy
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  simple_lambda_test:
+    name: Simple Lambda Test
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: ./lambda
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-1
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+
+      - name: Install boto3 For Simple Test
+        run: pip3 install boto3
+
+      - name: Run Unit Test
+        run: python test_simple_visit_count_lambda_function.py
+
+  mock_lambda_test:
+    name: Mock Lambda Test
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: ./lambda
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-1
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+
+      - name: Install boto3 For Simple Test
+        run: pip3 install boto3
+
+      - name: Run Mock Test
+        run: python test_comprehensive_visit_count_lambda_function.py
+
+  terraform_plan:
+    name: Terraform Plan
+    
+    needs:
+      - simple_lambda_test
+      - mock_lambda_test
+    if: github.event_name == 'pull_request'
+    
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      EXPAND_SUMMARY_DETAILS: true
+      TF_WORKSPACE: default # change for matrix runs
+
+    defaults:
+      run:
+        working-directory: ./infra
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Terraform Format
+        id: fmt
+        run: terraform fmt -check -recursive -diff
+        continue-on-error: true
+
+      - name: Post Format Comment
+        if: ${{ always() && (steps.fmt.outcome == 'success' || steps.fmt.outcome == 'failure') }}
+        uses: GetTerminus/terraform-pr-commenter@v3
+        with:
+          commenter_type: fmt
+          commenter_input: ${{ format('{0}{1}', steps.fmt.outputs.stdout, steps.fmt.outputs.stderr) }}
+          commenter_exitcode: ${{ steps.fmt.outputs.exitcode }}
+
+      - name: Terraform Init
+        id: init
+        run: terraform init -input=false
+      
+      - name: Post Init Comment
+        if: ${{ always() && (steps.init.outcome == 'success' || steps.init.outcome == 'failure') }}
+        uses: GetTerminus/terraform-pr-commenter@v3
+        with:
+          commenter_type: init
+          commenter_input: ${{ format('{0}{1}', steps.init.outputs.stdout, steps.init.outputs.stderr) }}
+          commenter_exitcode: ${{ steps.init.outputs.exitcode }}
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate
+      
+      - name: Post TF Validate Comment
+        if: ${{ always() && (steps.validate.outcome == 'success' || steps.validate.outcome == 'failure') }}
+        uses: GetTerminus/terraform-pr-commenter@v3
+        with:
+          commenter_type: validate
+          commenter_input: ${{ format('{0}{1}', steps.validate.outputs.stdout, steps.validate.outputs.stderr) }}
+          commenter_exitcode: ${{ steps.validate.outputs.exitcode }}
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -input=false |& tee tf_plan.txt 
+
+      - name: Post TF Plan Comment
+        uses: GetTerminus/terraform-pr-commenter@v3
+        with:
+          commenter_type: plan
+          commenter_plan_path: infra/tf_plan.txt
+          commenter_exitcode: ${{ steps.plan.outputs.exitcode }}
+
+  terraform_deploy:
+    name: Deploy 
+   
+    needs:
+      - simple_lambda_test
+      - mock_lambda_test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./infra
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Terraform Format
+        id: fmt
+        run: terraform fmt -check -recursive
+        continue-on-error: true
+
+      - name: Terraform Init
+        id: init
+        run: terraform init -input=false
+      
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate
+
+      - name: Terraform Apply
+        id: apply
+        run: terraform apply -auto-approve
+
