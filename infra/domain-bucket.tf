@@ -7,7 +7,7 @@ resource "aws_s3_bucket" "this" {
 resource "aws_s3_bucket_website_configuration" "this" {
   bucket = var.domain
   index_document {
-    suffix = "indexx.html"
+    suffix = "index.html"
   }
 }
 
