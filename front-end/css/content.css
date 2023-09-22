@@ -1,0 +1,52 @@
+.about-me{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.selfie {
+    height: 200px;
+    border-radius: 150px;
+    margin-bottom: 30px;
+}
+
+.description {
+    width: 800px;
+    margin-bottom: 100px;
+    font-weight: 700;
+    font-size: 20px;
+}
+
+content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-content: center;
+    margin-bottom: 350px;
+}
+
+h1 {
+    text-align: center;
+}
+
+ul li {
+    margin-bottom: 20px;
+}
+
+.line {
+    background-color: white;
+    height: 2px;
+    width: 70%;
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
+
+footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#counter {
+    margin-left: 10px;
+}
