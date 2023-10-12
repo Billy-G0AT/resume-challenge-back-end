@@ -1,4 +1,4 @@
-name: Test-Plan-Deploy
+name: Deploy
 
 on:
   pull_request:
@@ -7,12 +7,35 @@ on:
       - main
 
 jobs:
+  changes:
+    name: File Change Filter
+    runs-on: ubuntu-latest
+    outputs:
+      back-end: ${{ steps.filter.outputs.back-end }}
+      front-end: ${{ steps.filter.outputs.front-end }}
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        filters: |
+          back-end:
+            - 'back-end/**'
+          front-end:
+            - 'front-end/**'
+          allChanges:
+            - added|deleted|modified: '**'
+
   simple_lambda_test:
     name: Simple Lambda Test
+    needs: changes
+    if: ${{ needs.changes.outputs.back-end == 'true' }}
     runs-on: windows-latest
     defaults:
       run:
-        working-directory: ./lambda
+        working-directory: ./back-end/lambda
 
     steps:
       - name: Checkout Code
@@ -38,10 +61,12 @@ jobs:
 
   mock_lambda_test:
     name: Mock Lambda Test
+    needs: changes
+    if: ${{ needs.changes.outputs.back-end == 'true' }}
     runs-on: windows-latest
     defaults:
       run:
-        working-directory: ./lambda
+        working-directory: ./back-end/lambda
 
     steps:
       - name: Checkout Code
@@ -69,9 +94,10 @@ jobs:
     name: Terraform Plan
     
     needs:
+      - changes
       - simple_lambda_test
       - mock_lambda_test
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && needs.changes.outputs.back-end == 'true'
     
     runs-on: ubuntu-latest
     env:
@@ -81,7 +107,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: ./infra
+        working-directory: ./back-end/infra
     
     steps:
       - name: Checkout Code
@@ -145,18 +171,19 @@ jobs:
           commenter_plan_path: infra/tf_plan.txt
           commenter_exitcode: ${{ steps.plan.outputs.exitcode }}
 
-  terraform_deploy:
-    name: Deploy 
+  terraform_apply:
+    name: Terraform Apply
    
     needs:
+      - changes
       - simple_lambda_test
       - mock_lambda_test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.back-end == 'true'
     
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./infra
+        working-directory: ./back-end/infra
 
     steps:
       - name: Checkout Code
@@ -189,3 +216,24 @@ jobs:
         id: apply
         run: terraform apply -auto-approve
 
+  sync_s3:
+    name: Sync S3
+    needs: changes
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.front-end == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./front-end
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-1
+
+      - name: Upload Files To S3 Bucket
+        run: aws s3 sync . s3://billy-euceda.com --delete
