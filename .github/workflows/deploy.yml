@@ -216,6 +216,17 @@ jobs:
         id: apply
         run: terraform apply -auto-approve
 
+      - name: URL Injection
+        id: inject
+        uses: actions/github-script@v7
+        with:
+          script: |
+            file = "./front-end/javascript/visitor-counter.js"
+            variable = "apiUrl"
+            new_value= $(terraform output -raw api_url)
+
+            sed -i "s/\($variable[[:space:]]*=[[:space:]]*\)[^;]*/\1\"$new_value\";/" "$file"
+          
   sync_s3:
     name: Sync S3
     needs: changes
