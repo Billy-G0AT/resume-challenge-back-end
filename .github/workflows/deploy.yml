@@ -223,7 +223,7 @@ jobs:
           script: |
             file = "./front-end/javascript/visitor-counter.js"
             variable = "apiUrl"
-            new_value= $(terraform output -raw api_url)
+            new_value= "newValue"
 
             sed -i "s/\($variable[[:space:]]*=[[:space:]]*\)[^;]*/\1\"$new_value\";/" "$file"
           
