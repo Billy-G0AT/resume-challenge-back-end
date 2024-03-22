@@ -1,4 +1,6 @@
-fetch('https://080sgfhfqe.execute-api.us-west-1.amazonaws.com/dev/visit-count-function')
+var apiUrl = "https://080sgfhfqe.execute-api.us-west-1.amazonaws.com/dev/visit-count-function";
+
+fetch(apiUrl)
   .then(response => {
     // Checks if the request was successful (status 200)
     if (response.ok) {
