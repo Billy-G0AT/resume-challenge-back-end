@@ -229,7 +229,9 @@ jobs:
           
   sync_s3:
     name: Sync S3
-    needs: changes
+    needs: 
+      - changes
+      - terraform_apply
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.front-end == 'true'
     runs-on: ubuntu-latest
     defaults:
