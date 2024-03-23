@@ -217,10 +217,15 @@ jobs:
         run: |
           terraform apply --auto-approve
           
-      - name: Inject API URL
+      - name: Change Dir
+        id: dir
+        run: |
+          cd ../scripts
+
+      - name: Inject API
         id: inject
         run: |
-          pwd
+          ./api-injector.sh
 
   sync_s3:
     name: Sync S3
