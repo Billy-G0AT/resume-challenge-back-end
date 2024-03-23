@@ -222,7 +222,7 @@ jobs:
         id: inject
         run: |
           new_api_url="${{ steps.apply.outputs.api_url }}"
-          sed -i "s#var apiUrl = .*#var apiUrl = \"$new_api_url\"#" ./front-end/javascript/visitor-counter.js
+          sed -i "s#var apiUrl = .*#var apiUrl = \"$new_api_url\"#" ../../front-end/javascript/visitor-counter.js
 
   sync_s3:
     name: Sync S3
