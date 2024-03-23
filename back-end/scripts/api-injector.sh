@@ -5,7 +5,6 @@ cd ../infra
 
 # Capture Terraform Output
 new_url=$(terraform output -raw api_url)
-# new_url=$(terraform output -raw api_url)
 
 # Path to JavaScript file
 file="../../front-end/javascript/visitor-counter.js"

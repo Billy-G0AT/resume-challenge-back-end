@@ -215,18 +215,13 @@ jobs:
       - name: Terraform Apply
         id: apply
         run: |
-          terraform apply -auto-approve
-
-      - name: Get API URL
-        id: get
-        run: |
-          new_api_url="${{ steps.apply.outputs.api_url }}"
+          terraform apply --auto-approve
           
       - name: Inject API URL
         id: inject
         run: |
           cd ../scripts
-          ./api-injection.sh
+          ./api-injector.sh
 
   sync_s3:
     name: Sync S3
