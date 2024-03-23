@@ -220,8 +220,7 @@ jobs:
       - name: Inject API URL
         id: inject
         run: |
-          cd ../scripts
-          ./api-injector.sh
+          bash ../scripts/api-injector.sh
 
   sync_s3:
     name: Sync S3
