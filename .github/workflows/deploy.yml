@@ -216,7 +216,6 @@ jobs:
         id: apply
         run: |
           terraform apply -auto-approve
-          echo "::set-output name=api_url::$(terraform output -raw api_url)"
 
       - name: Get API URL
         id: get
@@ -226,7 +225,8 @@ jobs:
       - name: Inject API URL
         id: inject
         run: |
-          sed -i "s#var apiUrl = .*#var apiUrl = \"$new_api_url\"#" ../../front-end/javascript/visitor-counter.js
+          cd ../scripts
+          ./api-injection.sh
 
   sync_s3:
     name: Sync S3
