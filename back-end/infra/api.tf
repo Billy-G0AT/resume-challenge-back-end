@@ -23,7 +23,7 @@ resource "aws_apigatewayv2_api" "this" {
 #* API Stage
 resource "aws_apigatewayv2_stage" "this" {
   api_id      = aws_apigatewayv2_api.this.id
-  name        = "test2"
+  name        = "tired"
   auto_deploy = true
 }
 
