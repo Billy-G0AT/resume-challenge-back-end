@@ -1,4 +1,4 @@
-var apiUrl = "https://080sgfhfqe.execute-api.us-west-1.amazonaws.com/dev/visit-count-function";
+var apiUrl = "https://080sgfhfqe.execute-api.us-west-1.amazonaws.com/bar/visit-count-api";
 
 fetch(apiUrl)
   .then(response => {
