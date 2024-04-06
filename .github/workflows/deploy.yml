@@ -233,8 +233,8 @@ jobs:
 
       - name: Push Injection
         run: |
-          git config --global user.email "billymm314@gmail.com"
-          git config --global user.name "Billy Euceda"
+          git config --global user.email "resume-challenge@billyeuceda.com"
+          git config --global user.name "Auto Push"
           git add ../../front-end/javascript/visitor-counter.js
           git commit -m "Auto Push: URL Injection"
           git push
