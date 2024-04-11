@@ -32,7 +32,7 @@ jobs:
     name: Simple Lambda Test
     needs: changes
     if: ${{ needs.changes.outputs.back-end == 'true' }}
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./back-end/lambda
@@ -63,7 +63,7 @@ jobs:
     name: Mock Lambda Test
     needs: changes
     if: ${{ needs.changes.outputs.back-end == 'true' }}
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./back-end/lambda
